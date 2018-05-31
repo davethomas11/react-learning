@@ -15,7 +15,7 @@ let QueryChange = {
 }
 
 function updateQuery(stateObject, stateName, qs) {
-    window.history.pushState(stateObject, stateName, `/?${qs}`);
+    window.history.pushState(stateObject, stateName, `${window.location.pathname}?${qs}`);
 }
 
 function getQuery() {
