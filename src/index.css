@@ -17,8 +17,10 @@ div.row {
 
 
 span.block {
+  color: rgb(151, 146, 146);
   display: inline-block;
   border: 1px solid black; 
   box-sizing: border-box;   
-  font-size:10px;
+  font-size:8px;
+  user-select: none;
 }

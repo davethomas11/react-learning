@@ -1,18 +1,20 @@
 import React from 'react'
 
 export function Square(props) {
-    let {style, onClick, square} = props;
+    let {style, onPaint, onErase, square} = props;
 
     if (props.hit) {
         style = {
             ... style,
-            backgroundColor: props.hit
+            backgroundColor: `#${props.hit}`,
+            color: `#${props.hit}`
         }
     }
 
     return (
         <span 
-            onClick={onClick}
+            onMouseDown={onPaint}
+            onMouseEnter={(e) => { if (e.buttons & 1 == 1) onPaint() }}
             className="block" 
             style={style} >
             {square.x}, {square.y}

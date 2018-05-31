@@ -4,6 +4,11 @@ import './App.css';
 import Board from './Board';
 import Controls from './Controls';
 
+const defaultColor = "E71B1B";
+const defaultDimen = 30;
+const defaultWidth = 30;
+const defaultHeight = 20;
+
 class App extends Component {
   constructor(props) {
     super(props)
@@ -12,6 +17,7 @@ class App extends Component {
     this.handleWidthChange = this.handleWidthChange.bind(this);
     this.handleColorChange = this.handleColorChange.bind(this);
     this.handleDimenChange = this.handleDimenChange.bind(this);
+    this.handleClear = this.handleClear.bind(this);
     this.buildBoard = this.buildBoard.bind(this);
     this.onClick = this.onClick.bind(this);
     this.parseQuery = this.parseQuery.bind(this);
@@ -21,36 +27,43 @@ class App extends Component {
     this.props.onQueryChange.onChange = this.onQueryChange;
 
     const { query: qs } = this.props;
-    const w = qs["w"] || 30;
-    const h = qs["h"] || 20;
+    const w = qs["w"] || defaultWidth;
+    const h = qs["h"] || defaultHeight;
 
     this.state = {
-      dimen: qs["d"] || 30,
+      dimen: qs["d"] || defaultDimen,
       width: w,
       height: h,
       board: this.buildBoard(w, h),
       hits: this.parseQuery(this.props.query),
       step: 0,
-      color: qs["c"] || "red"
+      color: qs["c"] || defaultColor
     }
   }
   
   onQueryChange(qs) {
     super.setState({
       hits: this.parseQuery(qs),
-      dimen: qs["d"],
-      height: qs["h"],
-      width: qs["w"],
-      color: qs["c"]
+      dimen: qs["d"] || defaultDimen,
+      height: qs["h"] || defaultHeight,
+      width: qs["w"] || defaultWidth,
+      color: qs["c"] || defaultColor
     });
   }
 
   parseQuery(qs) {
     const hits = new Map();
-    for (let k in qs) {
-      if (/\d+-\d/.test(k)) {
-        hits.set(k, qs[k]);
-      }
+    if (qs["i"]) {
+      const colorHits = qs["i"].split("|");
+      colorHits.forEach(colorStr => {
+        if (colorStr.indexOf(':') != -1) {
+          const parts = colorStr.split(':');
+          const color = parts[0];
+          parts[1].split(",").forEach(coord => {
+            hits.set(coord, color);
+          });
+        }
+      });
     }
     return hits;
   }
@@ -70,7 +83,17 @@ class App extends Component {
     for (let i in map) {
       qs += `${i}=${map[i]}&`;
     }
-    hits.forEach((v,k) => qs += `${k}=${v}&`);
+
+    const colors = [];
+    hits.forEach((v, k) => {
+      if (!colors[v]) colors[v] = [];
+      colors[v].push(k);
+    });
+
+    qs += "i="
+    for (let i in colors) {
+      qs += `${i}:${colors[i].join(',')}|`;
+    }
     qs = qs.substring(0, qs.length - 1);
     this.props.updateQuery(hits, `Step ${this.state.step}`, qs);
 
@@ -80,11 +103,7 @@ class App extends Component {
   onClick(x, y) {
     const hits = new Map(this.state.hits);
     const key = `${x}-${y}`;
-    if (hits.get(key)) {
-      hits.delete(key);
-    } else {
-      hits.set(key, this.state.color);
-    }
+    hits.set(key, this.state.color);
 
     this.setState({
       hits: new Map(hits),
@@ -124,6 +143,7 @@ class App extends Component {
             onHeightChange={this.handleHeightChange}
             onWidthChange={this.handleWidthChange}
             onColorChange={this.handleColorChange}
+            onClear={this.handleClear}
             />
       </div>
     );
@@ -144,7 +164,7 @@ class App extends Component {
   }
 
   handleColorChange(c) {
-    this.setState({
+    super.setState({
       color: c
     });
   }
@@ -153,6 +173,12 @@ class App extends Component {
     this.setState({
       dimen: d
     });
+  }
+
+  handleClear() {
+    this.setState({
+      hits: new Map()
+    })
   }
 }
 

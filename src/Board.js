@@ -21,7 +21,7 @@ function Board(props) {
                 <div className="row" key={i}>
                     {row.map((col, j) =>
                         <Square 
-                            onClick={() => props.onClick(i, j)}
+                            onPaint={() => props.onClick(i, j)}
                             key={`${i}-${j}`}
                             square={col} 
                             hit={props.hits.get(`${i}-${j}`)}

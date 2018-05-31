@@ -1,5 +1,6 @@
 import React from 'react';
 import { Input } from './Input';
+import { SketchPicker } from 'react-color';
 
 function Controls(props) {
     const { 
@@ -10,11 +11,13 @@ function Controls(props) {
         onHeightChange, 
         onWidthChange,
         onColorChange,
-        onDimenChange
+        onDimenChange,
+        onClear
     } = props;
 
     return (
         <div className="controls">
+            <button onClick={onClear}>CLEAR</button>
             <Input 
                 displayName="Cell Dimensions:"
                 name="cells"
@@ -30,11 +33,10 @@ function Controls(props) {
                 name="width"
                 value={width}
                 onChange={(e) => onWidthChange(e.target.value)} />
-            <Input
-                displayName="Color:"
-                name="color"
-                value={color}
-                onChange={(e) => onColorChange(e.target.value)} />
+            <SketchPicker
+                color={color}
+                onChange={(e) => onColorChange(e.hex.substring(1))} />
+            
         </div>
     )
 }

@@ -5,7 +5,7 @@ export function Input(props) {
 
     return (
         <div className="input">
-            <label for={name}>{displayName}</label>
+            <label htmlFor={name}>{displayName}</label>
             <input 
                 name={name}
                 value={value} 
